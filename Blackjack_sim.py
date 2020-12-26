@@ -5,7 +5,7 @@ import random
 
 
 #to do:
-#player agent code
+#player agent code with soft totals supported
 
 
 
@@ -17,8 +17,6 @@ complete_deck = ['AC','2C','3C','4C','5C','6C','7C','8C','9C','TC','JC','QC','KC
 cards_in_play = []
 current_deck = complete_deck
 
-#this can be used in future so the player agent can retain knowledge from previous hands
-player_knowledge = [] 
 
 #deal two cards to the player and the dealer. calling this function should be done like so: "dealer_hand, player_hand = deal_starting_cards()"
 def deal_starting_cards():
@@ -120,21 +118,32 @@ def dealer_agent(dealer_hand):
         return dealer_hand
 
 #this is the logic that decides the players action. this will return the players final hand when finished running. the player is not allowed to access the current_deck variable
-def player_agent(player_hand, dealer_first_card,player_knowledge):
-    #this is temporary logic
-    player_hand = dealer_agent(player_hand)
-    return player_hand
+def player_agent(player_hand, dealer_upcard):
+    #this player stratergy is known as blackjack basic strategy but this implementation only uses hard totals not soft totals so it is not complete
+    hand_value = get_hand_value(player_hand)
+    dealer_upcard_value = get_hand_value(dealer_upcard)
+    print(hand_value)
+
+    if hand_value >= 17: #stand
+        return player_hand
+    elif hand_value > 12 and dealer_upcard_value > 6: #hit
+        return player_agent(draw_card(player_hand), dealer_upcard)
+    elif hand_value == 12 and dealer_upcard_value == {2,3,7,8,9,10,11}: #hit
+        return player_agent(draw_card(player_hand), dealer_upcard)
+    elif hand_value < 12: #hit
+        return player_agent(draw_card(player_hand), dealer_upcard)
+
+    return player_hand #this is here in case the logic has a bug and dosent call a return
 
 #this handles calling all agent functions and decides what agent won that hand
 def engine_loop():
     global current_deck
-    global player_knowledge
     player_win = 0 #set this to 1 if player wins
 
     dealer_hand, player_hand = deal_starting_cards()
     
     dealer_hand = dealer_agent(dealer_hand)
-    player_hand = player_agent(player_hand, 'null', player_knowledge)
+    player_hand = player_agent(player_hand, dealer_hand[0])
 
     dealer_hand_value = get_hand_value(dealer_hand)
     player_hand_value = get_hand_value(player_hand)
