@@ -122,7 +122,6 @@ def player_agent(player_hand, dealer_upcard):
     #this player stratergy is known as blackjack basic strategy but this implementation only uses hard totals not soft totals so it is not complete
     hand_value = get_hand_value(player_hand)
     dealer_upcard_value = get_hand_value(dealer_upcard)
-    print(hand_value)
 
     if hand_value >= 17: #stand
         return player_hand
