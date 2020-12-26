@@ -1,22 +1,21 @@
+import random
+
+#this was made by ForkMeSpoon, feel free to use it :)
+#sometimes i stream me making this bad code at www.twitch.tv/seymo5
+
+
 #to do:
-#check cards in hand when reshuffling
-#check who is bust or who wins
-#main loop
 #player agent code
 
 
 
-import random
+hands_playing = 100000 #the amount of hands being played, change this to change the amount of hands simulated
 
-
-#start by declaring needed variables
-
-hands_playing = 100 #the amount of hands being played
 
 #the first digit is the card and the second is the suit, eg. 'AC' = Ace of clubs. T = 10
 complete_deck = ['AC','2C','3C','4C','5C','6C','7C','8C','9C','TC','JC','QC','KC','AD','2D','3D','4D','5D','6D','7D','8D','9D','TD','JD','QD','KD','AH','2H','3H','4H','5H','6H','7H','8H','9H','TH','JH','QH','KH','AS','2S','3S','4S','5S','6S','7S','8S','9S','TS','JS','QS','KS']
-
-current_deck = complete_deck #do this to reset the temp deck
+cards_in_play = []
+current_deck = complete_deck
 
 #this can be used in future so the player agent can retain knowledge from previous hands
 player_knowledge = [] 
@@ -29,21 +28,31 @@ def deal_starting_cards():
     dealer_cards = []
     player_cards = []
     global current_deck
+    global cards_in_play
+    cards_in_play = []
     #generate cards
-    if len(current_deck) > 3:
+    if len(current_deck) > 3: #yes this is jank, but it works
         dealer_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
         dealer_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
         player_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
         player_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
+        cards_in_play.append(dealer_cards[0])
+        cards_in_play.append(dealer_cards[1])
+        cards_in_play.append(player_cards[0])
+        cards_in_play.append(player_cards[1])
     else:
         need_shuffle()
         dealer_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
+        cards_in_play.append(dealer_cards[0])
         need_shuffle()
         dealer_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
+        cards_in_play.append(dealer_cards[1])
         need_shuffle()
         player_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
+        cards_in_play.append(player_cards[0])
         need_shuffle()
         player_cards.append(current_deck.pop(random.randint(0,len(current_deck) - 1)))
+        cards_in_play.append(player_cards[1])
 
 
     return dealer_cards, player_cards
@@ -51,9 +60,13 @@ def deal_starting_cards():
 #check if the deck is empty and if so, reshuffle the discard pile back in. call this when drawing from the deck to make sure it gets shuffled when it runs out
 def need_shuffle():
     global current_deck
+    global cards_in_play
     if len(current_deck) == 0:
+        x = 0
         current_deck = ['AC','2C','3C','4C','5C','6C','7C','8C','9C','10C','JC','QC','KC','AD','2D','3D','4D','5D','6D','7D','8D','9D','10D','JD','QD','KD','AH','2H','3H','4H','5H','6H','7H','8H','9H','10H','JH','QH','KH','AS','2S','3S','4S','5S','6S','7S','8S','9S','10S','JS','QS','KS']
-    
+        while x < len(cards_in_play):
+            x = x + 1
+            current_deck.remove(cards_in_play[x - 1])
     return
 
 #split string into list of characters
@@ -106,7 +119,7 @@ def dealer_agent(dealer_hand):
     else:
         return dealer_hand
 
-#this is the logic that decides the players action. this will return the players final hand when finished running
+#this is the logic that decides the players action. this will return the players final hand when finished running. the player is not allowed to access the current_deck variable
 def player_agent(player_hand, dealer_first_card,player_knowledge):
     #this is temporary logic
     player_hand = dealer_agent(player_hand)
