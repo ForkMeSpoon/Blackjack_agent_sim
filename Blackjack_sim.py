@@ -1,7 +1,6 @@
 import random
 
 #this was made by ForkMeSpoon, feel free to use it :)
-#sometimes i stream me making this bad code at www.twitch.tv/seymo5
 
 
 #to do:
